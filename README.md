@@ -2,7 +2,7 @@
 
 ![ChatBot View](https://github.com/mart1428/ChatBotApp/blob/main/images/ChatBot%20View%201.png) ![Mental Health Therapist Bot](https://github.com/mart1428/ChatBotApp/blob/main/images/Therapist%20ChatBot%20View%201.png)
 
-Simple ChatBot App built with **Tkinter, and Huggingface**. It has mainly 2 capabilities:
+Simple ChatBot App built with **Tkinter, and Huggingface (Llama 2 13B Chat)**. It has mainly 2 capabilities:
 1. Regular ChatBot
    This ChatBot mode can be used to replicate ChatGPT. 
 2. Mental Health Therapist Bot
