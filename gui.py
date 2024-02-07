@@ -8,17 +8,15 @@ import torch
 
 class Application():
     def __init__(self):
-        # self.window = tk.Tk()
         ctk.set_default_color_theme("blue")
 
         self.window = ctk.CTk()
         self.window.title('ChatBot')
         self.window.geometry("960x300")
-        # self.window.resizable(width=False, height = False)
+        self.window.resizable(width=False, height = False)
 
-        self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Llama-2-13b-Chat-GGUF", model_file= 'llama-2-13b-chat.Q4_K_M.gguf', model_type="llama", gpu_layers = 100)
-
-
+        self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Llama-2-13b-Chat-GGUF", model_file= 'C:\\Users\\chris\\text-generation-webui\\models\\llama-2-13b-chat.Q4_K_M.gguf', model_type="llama", gpu_layers = 100)
+        # self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Llama-2-13b-Chat-GGUF", model_file= 'llama-2-13b-chat.Q4_K_M.gguf', model_type="llama", gpu_layers = 100)
         
         self.window._set_appearance_mode('light')
 
@@ -61,10 +59,12 @@ class Application():
         for i in range(1, len(self.chatHistory)):
             if i % 2 == 0:
                 self.chatBoxText.insert(ctk.END, '\nAI:')
+                self.chatBoxText.insert(ctk.END, '\n')
+                self.chatBoxText.insert(ctk.END, self.chatHistory[i][4:])
             else:
                 self.chatBoxText.insert(ctk.END, '\nYou:')
-            self.chatBoxText.insert(ctk.END, '\n')
-            self.chatBoxText.insert(ctk.END, self.chatHistory[i])
+                self.chatBoxText.insert(ctk.END, '\n')
+                self.chatBoxText.insert(ctk.END, self.chatHistory[i][6:])
 
             if i % 2 == 0:
                 self.chatBoxText.insert(ctk.END, '\n=============================================================================\n')
@@ -246,11 +246,13 @@ class Application():
         else:
             prompt = 'The following is a conversation with an AI Large Language Model. The AI has been trained to answer questions, provide recommendations, and help with decision making. The AI follows USER requests. The AI thinks outside the box.'
         
+        input_text = "USER: " + input_text
         self.chatHistory.append(input_text)
         input_text_with_history = ''.join(self.chatHistory[1:])
 
         decoded_out = self.model(f'{prompt}\nUSER:{input_text_with_history}\nAI:', temperature= 0.7, max_new_tokens= 1024, top_p = 0.9, top_k= 2, repetition_penalty= 1.15, stop=['USER:', '\n\n\n', 'AI:'])
-        self.chatHistory.append(decoded_out)
+        temp = "AI: " + decoded_out
+        self.chatHistory.append(temp)
         return decoded_out
 
     
