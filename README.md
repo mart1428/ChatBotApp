@@ -1,8 +1,8 @@
 # ChatBotApp
 
-![ChatBot View](https://github.com/mart1428/ChatBotApp/blob/main/images/ChatBot%20View%201.png) ![Mental Health Therapist Bot](https://github.com/mart1428/ChatBotApp/blob/main/images/Therapist%20ChatBot%20View%201.png)
+![ChatBot View](https://github.com/mart1428/ChatBotApp/blob/main/images/ChatBot%20View%202.png) ![Mental Health Therapist Bot](https://github.com/mart1428/ChatBotApp/blob/main/images/Therapist%20ChatBot%20View%202.png)
 
-Simple ChatBot App built with **Tkinter, and Huggingface (Llama 2 13B Chat)**. It has mainly 2 capabilities:
+Simple ChatBot App built with **Custom Tkinter, and Huggingface (Llama 2 13B Chat)**. It has mainly 2 capabilities:
 1. Regular ChatBot
    This ChatBot mode can be used to replicate ChatGPT. 
 2. Mental Health Therapist Bot
@@ -12,6 +12,8 @@ Simple ChatBot App built with **Tkinter, and Huggingface (Llama 2 13B Chat)**. I
 * Provide mode buttons to switch the chatbot version from Regular ChatBot to Mental Health Therapist Bot and vice versa.
 * A simple application that allows users to have a similar feeling of using ChatGPT.
 * Chat history are being used by the LLM model
+* Using CUDA to accelerate processing.
+* Light and Dark mode for viewing preference.
 
  ### Requirements:
  * ctransformers
@@ -25,4 +27,5 @@ Simple ChatBot App built with **Tkinter, and Huggingface (Llama 2 13B Chat)**. I
 * Prompt Engineering
 * HuggingFace
 * LLM
-* Tkinter
+* Tkinter / Custom Tkinter
+* CUDA
