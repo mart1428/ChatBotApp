@@ -4,10 +4,12 @@ import customtkinter as ctk
 
 from ctransformers import AutoModelForCausalLM
 
+from database import ChatHistoryDatabase
+
 import torch
 
 class Application():
-    def __init__(self):
+    def __init__(self, db_host = 'localhost', db_port = 27017):
         ctk.set_default_color_theme("blue")
 
         self.window = ctk.CTk()
@@ -15,8 +17,7 @@ class Application():
         self.window.geometry("960x300")
         self.window.resizable(width=False, height = False)
 
-        self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Llama-2-13b-Chat-GGUF", model_file= 'C:\\Users\\chris\\text-generation-webui\\models\\llama-2-13b-chat.Q4_K_M.gguf', model_type="llama", gpu_layers = 100)
-        # self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Llama-2-13b-Chat-GGUF", model_file= 'llama-2-13b-chat.Q4_K_M.gguf', model_type="llama", gpu_layers = 100)
+        self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Llama-2-13b-Chat-GGUF", model_file= 'llama-2-13b-chat.Q4_K_M.gguf', model_type="llama", gpu_layers = 100)
         
         self.window._set_appearance_mode('light')
 
@@ -26,6 +27,9 @@ class Application():
         self.warnWindowCounter = 0
         self.mode = 0
         self.appearanceMode = 0
+
+        self.database = ChatHistoryDatabase(db_host, db_port)
+        
         
 
     def createInterface(self):
@@ -245,6 +249,8 @@ class Application():
             prompt = 'The following is a conversation with an AI Large Language Model as a mental health therapist. The AI has been trained to answer questions, provide recommendations, help with decision making and provide comfort. The AI follows USER requests. The AI thinks outside the box.'
         else:
             prompt = 'The following is a conversation with an AI Large Language Model. The AI has been trained to answer questions, provide recommendations, and help with decision making. The AI follows USER requests. The AI thinks outside the box.'
+
+        # prompt = 'The following is a conversation with an AI Large Language Model. The AI has been trained to converse with USER as if they are best friends. The AI will answer questions, ask follow up questions and comfort the user if required. The AI will also initiate conversation on any topics that are not controversials. The AI will accept any role-playing requests but the AI will not explicitly ask for role-play. AI will not use any emojis or expressions.'
         
         input_text = "USER: " + input_text
         self.chatHistory.append(input_text)
