@@ -14,10 +14,11 @@ class Application():
 
         self.window = ctk.CTk()
         self.window.title('ChatBot')
-        self.window.geometry("960x300")
+        self.window.geometry("1100x300")
         self.window.resizable(width=False, height = False)
 
-        self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Llama-2-13b-Chat-GGUF", model_file= 'llama-2-13b-chat.Q4_K_M.gguf', model_type="llama", gpu_layers = 100)
+        # self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Llama-2-13b-Chat-GGUF", model_file= 'llama-2-13b-chat.Q4_K_M.gguf', model_type="llama", gpu_layers = 100)
+        self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Llama-2-13b-Chat-GGUF", model_file= 'C:\\Users\\chris\\text-generation-webui\\models\\llama-2-13b-chat.Q4_K_M.gguf', model_type="llama", gpu_layers = 100)
         
         self.window._set_appearance_mode('light')
 
@@ -33,14 +34,26 @@ class Application():
         
 
     def createInterface(self):
-        
+        self.setHistory()
         self.setChatBox()
         self.setFrame2()
         self.createModeButton()
 
+    def setHistory(self):
+        self.historyFrame = ctk.CTkFrame(master = self.window, width = 150, height = 50)
+        self.option_historySelect = ctk.CTkOptionMenu(master = self.historyFrame, width = 150, values = ['option 1', 'option 2'], command = self.optionSetChatHistory)
+
+        self.option_historySelect.pack()
+
+
+        self.historyFrame.grid(row = 0, column = 0, sticky = 'ns')
+
+    def optionSetChatHistory(self, choice):
+        pass
+
     def setChatBox(self):
         self.chatBoxFrame = ctk.CTkFrame(master = self.window, width= 800, height = 50)
-        self.chatBoxFrame.grid(row = 0, column= 0, sticky = 'ew', ipadx= 1, ipady= 1, padx = 1, pady = 1)
+        self.chatBoxFrame.grid(row = 0, column= 1, sticky = 'ew', ipadx= 1, ipady= 1, padx = 1, pady = 1)
         self.chatBoxFrame.columnconfigure(index = 0, weight = 1)
 
         self.chatHistory = []
@@ -113,11 +126,11 @@ class Application():
 
         self.createTextScrollbar()
 
-        self.inputText_frame.grid(row = 1, column= 0, sticky= 'ew')
+        self.inputText_frame.grid(row = 1, column= 1, sticky= 'ew')
         self.lbl_textEntry.grid(row = 0, column = 0, sticky= 'ew', ipadx = 5)
         self.ent_textEntry.grid(row = 0, column = 1, sticky = 'ew')
 
-        self.btn_frame.grid(row = 2, column = 0, sticky = 'e')
+        self.btn_frame.grid(row = 2, column = 1, sticky = 'e')
         self.btn_clrChat.grid(row = 1, column = 1, padx = 5, pady = 5, ipadx =5, sticky= 'e')
         self.btn_clrChat.grid_columnconfigure(0, weight = 1)
         self.btn_textEntry.grid(row = 1, column = 2, padx = 5, pady = 5, ipadx= 5, sticky= 'e')
@@ -138,7 +151,7 @@ class Application():
 
         self.swtch_appearance = ctk.CTkSwitch(master = self.btn_switch_frame, command = self.switch_appearance, text = 'Light Mode')
 
-        self.btn_switch_frame.grid(row= 0, column = 1, sticky = 'nsew')
+        self.btn_switch_frame.grid(row= 0, column = 2, sticky = 'nsew')
         self.btn_regularMode.grid(row = 1,column = 0, sticky = 'ew', padx = 2, pady = 5, ipadx = 2)
         self.btn_mentalTherapistMode.grid(row = 2,column = 0, sticky = 'ew', padx = 2, pady = 5, ipadx = 2)
         self.swtch_appearance.grid(row = 3, column = 0, sticky = 'nsew')
