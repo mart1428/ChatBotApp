@@ -21,8 +21,7 @@ class Application():
         self.window.geometry("1100x300")
         self.window.resizable(width=False, height = False)
 
-        # self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Llama-2-13b-Chat-GGUF", model_file= 'llama-2-13b-chat.Q4_K_M.gguf', model_type="llama", gpu_layers = 100)
-        self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Llama-2-13b-Chat-GGUF", model_file= "C:\\Users\\chris\\text-generation-webui\\models\\llama-2-13b-chat.Q4_K_M.gguf", model_type="llama", gpu_layers = 100)
+        self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Llama-2-13b-Chat-GGUF", model_file= 'llama-2-13b-chat.Q4_K_M.gguf', model_type="llama", gpu_layers = 100)
         self.window._set_appearance_mode('light')
 
         self.window.wm_iconbitmap('icons\\ChatBot.ico') #icon: https://icon-icons.com/download/65955/ICO/512/
