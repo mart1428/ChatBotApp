@@ -2,6 +2,9 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import customtkinter as ctk
 
+import pymongo
+from bson.objectid import ObjectId
+
 from ctransformers import AutoModelForCausalLM
 
 from database import ChatHistoryDatabase
@@ -18,18 +21,20 @@ class Application():
         self.window.resizable(width=False, height = False)
 
         # self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Llama-2-13b-Chat-GGUF", model_file= 'llama-2-13b-chat.Q4_K_M.gguf', model_type="llama", gpu_layers = 100)
-        self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Llama-2-13b-Chat-GGUF", model_file= 'C:\\Users\\chris\\text-generation-webui\\models\\llama-2-13b-chat.Q4_K_M.gguf', model_type="llama", gpu_layers = 100)
-        
+        self.model = AutoModelForCausalLM.from_pretrained("TheBloke/Llama-2-13b-Chat-GGUF", model_file= "C:\\Users\\chris\\text-generation-webui\\models\\llama-2-13b-chat.Q4_K_M.gguf", model_type="llama", gpu_layers = 100)
         self.window._set_appearance_mode('light')
 
         self.window.wm_iconbitmap('icons\\ChatBot.ico') #icon: https://icon-icons.com/download/65955/ICO/512/
-        self.createInterface()
-
         self.warnWindowCounter = 0
-        self.mode = 0
-        self.appearanceMode = 0
+        
+        # self.mode = 0
+        self.prompt = 'The following is a conversation with an AI Large Language Model. The AI has been trained to answer questions, provide recommendations, and help with decision making. The AI follows USER requests. The AI thinks outside the box.'
+        self.summary = None
 
-        self.database = ChatHistoryDatabase(db_host, db_port)
+        self.appearanceMode = 0
+        self.database = ChatHistoryDatabase('localhost', 27017)
+
+        self.createInterface()
         
         
 
@@ -38,18 +43,44 @@ class Application():
         self.setChatBox()
         self.setFrame2()
         self.createModeButton()
+        self.optionSetChatHistory(self.option_historySelect.get())
 
     def setHistory(self):
         self.historyFrame = ctk.CTkFrame(master = self.window, width = 150, height = 50)
-        self.option_historySelect = ctk.CTkOptionMenu(master = self.historyFrame, width = 150, values = ['option 1', 'option 2'], command = self.optionSetChatHistory)
+        latestDocs = self.database.collection.find({}).sort('timestamp', pymongo.DESCENDING).limit(4)
+        summaryList = []
 
+        summaryList.append('New Chat')
+        for i in latestDocs:
+            summaryList.append(i['summary'])
+
+        self.option_historySelect = ctk.CTkOptionMenu(master = self.historyFrame, width = 150, values = summaryList, command = self.optionSetChatHistory)
         self.option_historySelect.pack()
-
-
         self.historyFrame.grid(row = 0, column = 0, sticky = 'ns')
 
+    def refreshOption(self):
+        latestDocs = self.database.collection.find({}).sort('timestamp', pymongo.DESCENDING).limit(4)
+        summaryList = []
+
+        summaryList.append('New Chat')
+        for i in latestDocs:
+            summaryList.append(i['summary'])
+        self.option_historySelect.set(self.summary)
+
+
     def optionSetChatHistory(self, choice):
-        pass
+        if choice != 'New Chat':
+            data = self.database.collection.find({'summary' : choice}).limit(1)[0]
+            self.prompt = data['prompt']
+            self.summary = data['summary']
+            self.chatHistory = data['history']
+        else:
+            self.prompt = 'The following is a conversation with an AI Large Language Model. \
+                The AI has been trained to converse with USER as if they are best friends. \
+                The AI will answer questions, ask follow up questions and comfort the user if required. \
+                The AI will also initiate conversation on any topics that are not controversials. \
+                The AI will accept any role-playing requests but the AI will not explicitly ask for role-play. AI will not use any emojis or expressions.'
+
 
     def setChatBox(self):
         self.chatBoxFrame = ctk.CTkFrame(master = self.window, width= 800, height = 50)
@@ -252,16 +283,20 @@ class Application():
         input_text = self.ent_textEntry.get("0.0",tk.END)
 
         out = self.get_model_output(input_text)
+        if self.summary == None:
+            self.createSummary()
+
         self.refreshChatFrame()
+        self.refreshOption()
         self.ent_textEntry.delete("0.0", tk.END)
 
 
     def get_model_output(self, input_text):
 
-        if self.mode == 1:
-            prompt = 'The following is a conversation with an AI Large Language Model as a mental health therapist. The AI has been trained to answer questions, provide recommendations, help with decision making and provide comfort. The AI follows USER requests. The AI thinks outside the box.'
-        else:
-            prompt = 'The following is a conversation with an AI Large Language Model. The AI has been trained to answer questions, provide recommendations, and help with decision making. The AI follows USER requests. The AI thinks outside the box.'
+        # if self.mode == 1:
+            # prompt = 'The following is a conversation with an AI Large Language Model as a mental health therapist. The AI has been trained to answer questions, provide recommendations, help with decision making and provide comfort. The AI follows USER requests. The AI thinks outside the box.'
+        # else:
+            # prompt = 'The following is a conversation with an AI Large Language Model. The AI has been trained to answer questions, provide recommendations, and help with decision making. The AI follows USER requests. The AI thinks outside the box.'
 
         # prompt = 'The following is a conversation with an AI Large Language Model. The AI has been trained to converse with USER as if they are best friends. The AI will answer questions, ask follow up questions and comfort the user if required. The AI will also initiate conversation on any topics that are not controversials. The AI will accept any role-playing requests but the AI will not explicitly ask for role-play. AI will not use any emojis or expressions.'
         
@@ -269,10 +304,13 @@ class Application():
         self.chatHistory.append(input_text)
         input_text_with_history = ''.join(self.chatHistory[1:])
 
-        decoded_out = self.model(f'{prompt}\nUSER:{input_text_with_history}\nAI:', temperature= 0.7, max_new_tokens= 1024, top_p = 0.9, top_k= 2, repetition_penalty= 1.15, stop=['USER:', '\n\n\n', 'AI:'])
+        decoded_out = self.model(f'{self.prompt}\nUSER:{input_text_with_history}\nAI:', temperature= 0.7, max_new_tokens= 1024, top_p = 0.9, top_k= 2, repetition_penalty= 1.15, stop=['USER:', '\n\n\n', 'AI:'])
         temp = "AI: " + decoded_out
         self.chatHistory.append(temp)
         return decoded_out
+    
+    def createSummary(self):
+        self.summary = self.model("Conversation: " + ''.join(self.chatHistory[1:]) + "\nOne short sentence summary: ", max_new_tokens= 20)
 
     
 if __name__ == '__main__':

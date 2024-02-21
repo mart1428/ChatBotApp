@@ -37,5 +37,5 @@ class ChatHistoryDatabase():
 if __name__ == "__main__":
     database = ChatHistoryDatabase()
     # database.insert_one_document(summary = 'test2', prompt = 'test2', history = '[]' )
-    print(database.update_chat_history(ObjectId('65c947553781b930be32bbae'), [[1]]))
-    database.show_recent_documents()
+    # print(database.update_chat_history(ObjectId('65c947553781b930be32bbae'), [[1]]))
+    database.retrieve_latest_document()
